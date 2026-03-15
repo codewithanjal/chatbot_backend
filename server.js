@@ -22,10 +22,21 @@ app.use(express.json());
 // Routes
 app.use('/api/chat', chatRoutes);
 
+app.get('/health', async (req, res) => {
+    const dbStatus = mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected';
+    res.json({
+        status: 'Server is running',
+        database: dbStatus,
+        readyState: mongoose.connection.readyState, // 0: disconnected, 1: connected, 2: connecting, 3: disconnecting
+        timestamp: new Date().toISOString()
+    });
+});
+
 app.get('/', (req, res) => {
     res.send('Chatbot API is running...');
 });
 
+import mongoose from 'mongoose'; // Added import for health check status
 const PORT = process.env.PORT || 5000;
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
