@@ -9,8 +9,19 @@ const openai = new OpenAI({
     baseURL: process.env.LLM_BASE_URL,
 });
 
+import mongoose from 'mongoose';
+
 export const processChatMessage = async (req, res) => {
     try {
+        // Check if database is connected before proceeding
+        if (mongoose.connection.readyState !== 1) {
+            console.error('Database not connected. ReadyState:', mongoose.connection.readyState);
+            return res.status(503).json({ 
+                error: 'Database connection is not established. Please check server logs or .env configuration.',
+                readyState: mongoose.connection.readyState
+            });
+        }
+
         const { message, chatId } = req.body;
 
         if (!message) {
