@@ -10,14 +10,18 @@ const openai = new OpenAI({
 });
 
 import mongoose from 'mongoose';
+import connectDB from '../config/db.js';
 
 export const processChatMessage = async (req, res) => {
     try {
+        // Ensure database is connected (awaits existing connection promise if one exists)
+        await connectDB();
+        
         // Check if database is connected before proceeding
         if (mongoose.connection.readyState !== 1) {
             console.error('Database not connected. ReadyState:', mongoose.connection.readyState);
             return res.status(503).json({ 
-                error: 'Database connection is not established. Please check server logs or .env configuration.',
+                error: 'Database connection is still in progress or failed. Please retry in a moment.',
                 readyState: mongoose.connection.readyState
             });
         }
